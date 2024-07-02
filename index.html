@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>עשר שאלות - פורום מנהיגות חינוכי</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f8ff;
+        }
+        #question-section, #result-section {
+            display: none;
+        }
+        #confetti {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            opacity: 0;
+            will-change: transform, opacity;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            0% {
+                transform: translateY(-10vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>עשר שאלות - פורום מנהיגות חינוכי</h1>
+    <button id="start-button">מוכנים להתחיל? לחצו כאן</button>
+    <div id="question-section">
+        <h2 id="question-text"></h2>
+        <input type="text" id="answer-input">
+        <button id="submit-button">שלח</button>
+        <p id="message"></p>
+    </div>
+    <div id="result-section">
+        <h2 id="result-message"></h2>
+    </div>
+    <div id="confetti"></div>
+    <audio id="background-music" src="your-music-file.mp3" loop></audio>
+
+    <script>
+        const questions = [
+            { question: "מה הקשר בין לירז לאלומת שיבולים?", answer: "עומר" },
+            { question: "באיזה כלי נגינה מנגן רון בהרכב מוזיקלי?", answer: "גיטרה בס" },
+            { question: "באיזה בית ספר למדה ביתה של סיון ארפין לפני שעזבו את נשר?", answer: "בית יהושע" },
+            { question: "על מי מהמעגל נכתבה כתבה מפרגנת על הצעת הנישואין שלו\\ה?", answer: "ליאור" },
+            { question: "מי התחילה את דרכה החינוכית ביגור?", answer: "גלית" },
+            { question: "למי מהמעגל יש דרכון פורטוגלי?", answer: "לירון" },
+            { question: "למי במעגל יש לפחות שיר אחד (מקורי משלו\\שלה) בספוטיפיי?", answer: "אריק" },
+            { question: "מי הוביל.ה את מעגל הנשים בקריות?", answer: "קלרית" },
+            { question: "מי מהמעגל מחזיקה בשני תארים בהצטיינות?", answer: "גלי" },
+            { question: "מי מהמעגל היה\\הייתה מ\"פ בקורס קצינים?", answer: "יפעת" },
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let attempts = 3;
+
+        const startButton = document.getElementById('start-button');
+        const questionSection = document.getElementById('question-section');
+        const resultSection = document.getElementById('result-section');
+        const questionText = document.getElementById('question-text');
+        const answerInput = document.getElementById('answer-input');
+        const submitButton = document.getElementById('submit-button');
+        const message = document.getElementById('message');
+        const resultMessage = document.getElementById('result-message');
+        const backgroundMusic = document.getElementById('background-music');
+        const confettiContainer = document.getElementById('confetti');
+
+        startButton.addEventListener('click', () => {
+            startButton.style.display = 'none';
+            questionSection.style.display = 'block';
+            backgroundMusic.play();
+            showQuestion();
+        });
+
+        submitButton.addEventListener('click', checkAnswer);
+
+        function showQuestion() {
+            if (currentQuestionIndex < questions.length) {
+                questionText.textContent = questions[currentQuestionIndex].question;
+                answerInput.value = '';
+                message.textContent = '';
+                attempts = 3;
+            } else {
+                endGame();
+            }
+        }
+
+        function checkAnswer() {
+            const userAnswer = answerInput.value.trim();
+            if (userAnswer.toLowerCase() === questions[currentQuestionIndex].answer.toLowerCase()) {
+                score++;
+                showConfetti();
+                message.textContent = "הצלחתן לענות על השאלה! כל הכבוד!";
+                currentQuestionIndex++;
+                setTimeout(showQuestion, 2000);
+            } else {
+                attempts--;
+                if (attempts > 0) {
+                    message.textContent = `תשובה שגויה. נותרו לך ${attempts} ניסיונות נוספים.`;
+                } else {
+                    message.textContent = "השאלה נפסלה.";
+                    currentQuestionIndex++;
+                    setTimeout(showQuestion, 2000);
+                }
+            }
+        }
+
+        function endGame() {
+            questionSection.style.display = 'none';
+            resultSection.style.display = 'block';
+            backgroundMusic.pause();
+            if (score > questions.length / 2) {
+                resultMessage.textContent = "תודה ששיחקתן בקופסאות הבריחה של פורום המנהיגות החינוכי של נשר. מקווה שנהניתן.";
+            } else {
+                resultMessage.textContent = "לא הצלחתם לענות על רוב השאלות. נסו שוב!";
+            }
+        }
+
+        function showConfetti() {
+            for (let i = 0; i < 100; i++) {
+                const confettiPiece = document.createElement('div');
+                confettiPiece.classList.add('confetti-piece');
+                confettiPiece.style.left = `${Math.random() * 100}%`;
+                confettiPiece.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                confettiPiece.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                confettiContainer.appendChild(confettiPiece);
+                setTimeout(() => confettiPiece.remove(), 5000);
+            }
+        }
+    </script>
+</body>
+</html>
